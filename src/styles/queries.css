@@ -1,0 +1,17 @@
+@media screen and (max-width: calc(900em/ 16)) {
+  html {
+    font-size: 60%;
+  }
+}
+
+@media screen and (max-width: calc(799em/ 16)) {
+  html {
+    font-size: 54%;
+  }
+}
+
+@media screen and (max-width: calc(500em/ 16)) {
+  html {
+    font-size: 48%;
+  }
+}
