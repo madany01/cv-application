@@ -26,3 +26,16 @@ textarea {
 i {
   display: inline-block;
 }
+
+ul {
+  list-style: none;
+}
+
+html {
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+body {
+  min-height: 100vh;
+}

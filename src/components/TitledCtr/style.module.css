@@ -1,0 +1,18 @@
+.titledCtr {
+  padding: 0.4rem;
+}
+
+.titledCtr__title {
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-bottom: 2.4rem;
+  text-transform: capitalize;
+  color: #ab784e;
+}
+
+@media print {
+  .titledCtr__title {
+    color: #140b03;
+  }
+}

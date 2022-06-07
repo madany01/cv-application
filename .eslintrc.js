@@ -20,5 +20,6 @@ module.exports = {
     'no-console': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-props-no-spreading': 'off',
+    'react/state-in-constructor': 'off',
   },
 }

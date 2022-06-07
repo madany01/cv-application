@@ -1,0 +1,11 @@
+.ctr {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2.4rem;
+}
+
+.ctr > * {
+  flex-basis: 46%;
+  flex-grow: 1;
+}

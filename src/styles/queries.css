@@ -10,8 +10,11 @@
   }
 }
 
-@media screen and (max-width: calc(500em/ 16)) {
-  html {
-    font-size: 48%;
+@media print {
+  .btn {
+    opacity: 0 !important;
+  }
+  .mainCtr {
+    background-color: transparent !important;
   }
 }

@@ -1,0 +1,107 @@
+:root {
+  --color-white: #fefefe;
+  --color-silver: #f0f0f0;
+  --color-black: #444;
+  --color-woody: #ad7f00;
+  --color-green: #087f5b;
+  --color-tomato: #c5421a;
+  --color-blue: #1a56c5;
+  --color-turquoise: #1abac5;
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+}
+
+.flexWrap--wrap {
+  flex-wrap: wrap;
+}
+
+.justifyContent--end {
+  justify-content: end;
+}
+
+.gap--lg {
+  gap: 4rem;
+}
+
+.gap--md {
+  gap: 2rem;
+}
+
+.gap--sm {
+  gap: 1rem;
+}
+
+.gap--xs {
+  gap: 0.5rem;
+}
+
+.btn {
+  padding: 0.8rem 1.6rem;
+  font-size: 1.4rem;
+  font-weight: 500;
+  border-radius: 4px;
+  align-self: end;
+  color: #fefefe;
+}
+
+.btn--edit {
+  background-color: #ad7f00;
+}
+
+.btn--print,
+.btn--submit {
+  background-color: #087f5b;
+}
+
+.btn--delete {
+  background-color: #c5421a;
+}
+
+.btn--add {
+  background-color: #1a56c5;
+}
+
+.btn--cancel {
+  background-color: #444;
+  color: #fefefe;
+}
+
+.btn--save {
+  background-color: #1abac5;
+}
+
+label {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #444;
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+}
+
+label::before {
+  content: ' * ';
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: tomato;
+}
+
+input,
+textarea {
+  min-width: min(30rem, 100%);
+  padding: 0.8rem 1.2rem;
+  background-color: transparent;
+  border: 1px solid grey;
+  border-radius: 0.8rem;
+  color: #084e39;
+  font-size: 1.3rem;
+  outline-color: #ab784e;
+  transition: all 0.3s;
+}

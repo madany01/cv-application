@@ -1,90 +1,173 @@
 import React from 'react'
 
+import HorizontalSeparator from './HorizontalSeparator'
+import DynamicList from './DynamicList'
+
+import withEdit from './withEdit'
+import withSaveAndCancel from './withSaveAndCancel'
+
+import PersonalSummary from './PersonalSummary'
+import EducationalSummary from './EducationalSummary'
+import PracticalSummary from './PracticalSummary'
+
+import PersonalInputs from './PersonalInputs'
+import EducationalInputs from './EducationalInputs'
+import PracticalInputs from './PracticalInputs'
+
+import {
+  createEmptyEducationalData,
+  createEmptyPracticalData,
+  createBoundedFunctions,
+} from '../utils'
+
+const PersonalSummaryWithEdit = withEdit(PersonalSummary)
+const EducationalSummaryWithEdit = withEdit(EducationalSummary)
+const PracticalSummaryWithEdit = withEdit(PracticalSummary)
+
+const PersonalInputsWithSaveCancel = withSaveAndCancel(PersonalInputs)
+const DynamicListWithSaveCancel = withSaveAndCancel(DynamicList)
+
+const INFO_TYPES = ['personal', 'educational', 'practical']
+
 class CVSummary extends React.Component {
-  onEditBtnClick = () => {
-    this.props.onEditBtnClick()
+  state = {
+    editables: {},
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.onTypeChange = createBoundedFunctions(INFO_TYPES, this.onChange)
+    this.onTypeEditClick = createBoundedFunctions(INFO_TYPES, this.onEditClick)
+    this.onTypeCancel = createBoundedFunctions(INFO_TYPES, this.onCancel)
+    this.onTypeSave = createBoundedFunctions(INFO_TYPES, this.onSave)
+  }
+
+  onEditClick = infoType => {
+    const {
+      cvData: { [infoType]: infoTypeValues },
+    } = this.props
+
+    this.setState(prevState => ({
+      editables: { ...prevState.editables, [infoType]: infoTypeValues },
+    }))
+  }
+
+  onChange = (infoType, changedValues) => {
+    const {
+      editables: { [infoType]: infoTypeValues },
+    } = this.state
+
+    this.setState(prevState => {
+      if (infoType === 'personal')
+        return {
+          editables: { ...prevState.editables, [infoType]: { ...infoTypeValues, ...changedValues } },
+        }
+
+      return {
+        editables: { ...prevState.editables, [infoType]: changedValues },
+      }
+    })
+  }
+
+  onCancel = infoType => {
+    this.setState(prevState => {
+      const {
+        editables: { [infoType]: _, ...restEditables },
+      } = prevState
+
+      return { editables: restEditables }
+    })
+  }
+
+  onSave = infoType => {
+    const { onChange, cvData } = this.props
+
+    const {
+      editables: { [infoType]: infoTypeValues },
+    } = this.state
+
+    this.onCancel(infoType)
+
+    onChange({ ...cvData, [infoType]: infoTypeValues })
+  }
+
+  static onPrint() {
+    window.print()
   }
 
   render() {
     const {
-      name,
-      email,
-      phoneNumber,
-      instituteName,
-      major,
-      studyPeriod,
-      companyName,
-      positionTitle,
-      jobTasks,
-      companyJoiningDate,
-      companyLeavingDate,
-    } = this.props.applicantInfo
+      cvData: { personal: personalProps, educational: educationalProps, practical: practicalProps },
+    } = this.props
+
+    const {
+      editables: {
+        personal: dirtyPersonal,
+        educational: dirtyEducational,
+        practical: dirtyPractical,
+      },
+    } = this.state
+
+    const noEditing = Object.keys(this.state.editables).length === 0
+
     return (
-      <div className="summary">
-        <table>
-          <tbody>
-            <tr className="categoryRow">
-              <td colSpan="2">personal info</td>
-            </tr>
-            <tr>
-              <th>name</th>
-              <td>{name}</td>
-            </tr>
-            <tr>
-              <th>email</th>
-              <td>{email}</td>
-            </tr>
-            <tr>
-              <th>phone number</th>
-              <td>{phoneNumber}</td>
-            </tr>
+      <div className="flexCol gap--sm">
+        <HorizontalSeparator>
+          {dirtyPersonal ? (
+            <PersonalInputsWithSaveCancel
+              values={dirtyPersonal}
+              onChange={this.onTypeChange.personal}
+              onCancelClick={this.onTypeCancel.personal}
+              onSaveClick={this.onTypeSave.personal}
+            />
+          ) : (
+            <PersonalSummaryWithEdit
+              values={personalProps}
+              onEditClick={this.onTypeEditClick.personal}
+            />
+          )}
 
-            <tr className="categoryRow">
-              <td colSpan="2">educational experience</td>
-            </tr>
-            <tr>
-              <th>institute</th>
-              <td>{instituteName}</td>
-            </tr>
-            <tr>
-              <th>major</th>
-              <td>{major}</td>
-            </tr>
-            <tr>
-              <th>study period (in years)</th>
-              <td>{studyPeriod}</td>
-            </tr>
+          {dirtyEducational ? (
+            <DynamicListWithSaveCancel
+              listTitle="educational info"
+              valuesList={dirtyEducational}
+              ListItemComponent={EducationalInputs}
+              createNewListItem={createEmptyEducationalData}
+              onChange={this.onTypeChange.educational}
+              onCancelClick={this.onTypeCancel.educational}
+              onSaveClick={this.onTypeSave.educational}
+            />
+          ) : (
+            <EducationalSummaryWithEdit
+              valuesList={educationalProps}
+              onEditClick={this.onTypeEditClick.educational}
+            />
+          )}
 
-            <tr className="categoryRow">
-              <td colSpan="2">practical experience</td>
-            </tr>
-            <tr>
-              <th>company name</th>
-              <td>{companyName}</td>
-            </tr>
-            <tr>
-              <th>position title</th>
-              <td>{positionTitle}</td>
-            </tr>
-            <tr>
-              <th>company joining date</th>
-              <td>{companyJoiningDate}</td>
-            </tr>
-            <tr>
-              <th>company leaving date</th>
-              <td>{companyLeavingDate}</td>
-            </tr>
-            <tr>
-              <th>main job tasks</th>
-              <td>
-                <div>{jobTasks}</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button type="button" className="btn--edit" onClick={this.onEditBtnClick}>
-          edit
-        </button>
+          {dirtyPractical ? (
+            <DynamicListWithSaveCancel
+              listTitle="practical info"
+              valuesList={dirtyPractical}
+              ListItemComponent={PracticalInputs}
+              createNewListItem={createEmptyPracticalData}
+              onChange={this.onTypeChange.practical}
+              onCancelClick={this.onTypeCancel.practical}
+              onSaveClick={this.onTypeSave.practical}
+            />
+          ) : (
+            <PracticalSummaryWithEdit
+              valuesList={practicalProps}
+              onEditClick={this.onTypeEditClick.practical}
+            />
+          )}
+
+          {noEditing && (
+            <button type="button" className="btn btn--print" onClick={this.constructor.onPrint}>
+              Print to PDF
+            </button>
+          )}
+        </HorizontalSeparator>
       </div>
     )
   }

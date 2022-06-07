@@ -1,0 +1,21 @@
+.header {
+  border-bottom: 0.1rem solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0b0c1e;
+  padding: 0.8rem;
+}
+
+.logo {
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 500;
+  font-style: italic;
+}
+
+@media print {
+  .header {
+    display: none;
+  }
+}
