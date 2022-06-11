@@ -1,5 +1,4 @@
-import React from 'react'
-
+import { useState } from 'react'
 import HorizontalSeparator from './HorizontalSeparator'
 import DynamicList from './DynamicList'
 
@@ -29,148 +28,109 @@ const DynamicListWithSaveCancel = withSaveAndCancel(DynamicList)
 
 const INFO_TYPES = ['personal', 'educational', 'practical']
 
-class CVSummary extends React.Component {
-  state = {
-    editables: {},
+function CVSummary({ cvData, onChange: propsOnChange }) {
+  const [dirtyPersonal, setDirtyPersonal] = useState(null)
+  const [dirtyEducational, setDirtyEducational] = useState(null)
+  const [dirtyPractical, setDirtyPractical] = useState(null)
+
+  const infoTypeDict = {
+    personal: { value: dirtyPersonal, set: value => setDirtyPersonal(value) },
+    educational: { value: dirtyEducational, set: value => setDirtyEducational(value) },
+    practical: { value: dirtyPractical, set: value => setDirtyPractical(value) },
   }
 
-  constructor(props) {
-    super(props)
-
-    this.onTypeChange = createBoundedFunctions(INFO_TYPES, this.onChange)
-    this.onTypeEditClick = createBoundedFunctions(INFO_TYPES, this.onEditClick)
-    this.onTypeCancel = createBoundedFunctions(INFO_TYPES, this.onCancel)
-    this.onTypeSave = createBoundedFunctions(INFO_TYPES, this.onSave)
+  const onEditClick = infoType => {
+    infoTypeDict[infoType].set(cvData[infoType])
   }
 
-  onEditClick = infoType => {
-    const {
-      cvData: { [infoType]: infoTypeValues },
-    } = this.props
-
-    this.setState(prevState => ({
-      editables: { ...prevState.editables, [infoType]: infoTypeValues },
-    }))
+  const onChange = (infoType, changedValues) => {
+    infoTypeDict[infoType].set(changedValues)
   }
 
-  onChange = (infoType, changedValues) => {
-    const {
-      editables: { [infoType]: infoTypeValues },
-    } = this.state
-
-    this.setState(prevState => {
-      if (infoType === 'personal')
-        return {
-          editables: { ...prevState.editables, [infoType]: { ...infoTypeValues, ...changedValues } },
-        }
-
-      return {
-        editables: { ...prevState.editables, [infoType]: changedValues },
-      }
-    })
+  const onCancel = infoType => {
+    infoTypeDict[infoType].set(null)
   }
 
-  onCancel = infoType => {
-    this.setState(prevState => {
-      const {
-        editables: { [infoType]: _, ...restEditables },
-      } = prevState
+  const onSave = infoType => {
+    const infoTypeValues = infoTypeDict[infoType].value
 
-      return { editables: restEditables }
-    })
+    onCancel(infoType)
+    propsOnChange(infoType, infoTypeValues)
   }
 
-  onSave = infoType => {
-    const { onChange, cvData } = this.props
-
-    const {
-      editables: { [infoType]: infoTypeValues },
-    } = this.state
-
-    this.onCancel(infoType)
-
-    onChange({ ...cvData, [infoType]: infoTypeValues })
-  }
-
-  static onPrint() {
+  const onPrint = () => {
     window.print()
   }
 
-  render() {
-    const {
-      cvData: { personal: personalProps, educational: educationalProps, practical: practicalProps },
-    } = this.props
+  const {
+    personal: personalProps,
+    educational: educationalProps,
+    practical: practicalProps,
+  } = cvData
 
-    const {
-      editables: {
-        personal: dirtyPersonal,
-        educational: dirtyEducational,
-        practical: dirtyPractical,
-      },
-    } = this.state
+  const noEditing = (dirtyPersonal ?? dirtyEducational ?? dirtyPractical) === null
 
-    const noEditing = Object.keys(this.state.editables).length === 0
+  const onTypeEditClick = createBoundedFunctions(INFO_TYPES, onEditClick)
+  const onTypeChange = createBoundedFunctions(INFO_TYPES, onChange)
+  const onTypeCancel = createBoundedFunctions(INFO_TYPES, onCancel)
+  const onTypeSave = createBoundedFunctions(INFO_TYPES, onSave)
 
-    return (
-      <div className="flexCol gap--sm">
-        <HorizontalSeparator>
-          {dirtyPersonal ? (
-            <PersonalInputsWithSaveCancel
-              values={dirtyPersonal}
-              onChange={this.onTypeChange.personal}
-              onCancelClick={this.onTypeCancel.personal}
-              onSaveClick={this.onTypeSave.personal}
-            />
-          ) : (
-            <PersonalSummaryWithEdit
-              values={personalProps}
-              onEditClick={this.onTypeEditClick.personal}
-            />
-          )}
+  return (
+    <div className="flexCol gap--sm">
+      <HorizontalSeparator>
+        {dirtyPersonal ? (
+          <PersonalInputsWithSaveCancel
+            values={dirtyPersonal}
+            onChange={onTypeChange.personal}
+            onCancelClick={onTypeCancel.personal}
+            onSaveClick={onTypeSave.personal}
+          />
+        ) : (
+          <PersonalSummaryWithEdit values={personalProps} onEditClick={onTypeEditClick.personal} />
+        )}
 
-          {dirtyEducational ? (
-            <DynamicListWithSaveCancel
-              listTitle="educational info"
-              valuesList={dirtyEducational}
-              ListItemComponent={EducationalInputs}
-              createNewListItem={createEmptyEducationalData}
-              onChange={this.onTypeChange.educational}
-              onCancelClick={this.onTypeCancel.educational}
-              onSaveClick={this.onTypeSave.educational}
-            />
-          ) : (
-            <EducationalSummaryWithEdit
-              valuesList={educationalProps}
-              onEditClick={this.onTypeEditClick.educational}
-            />
-          )}
+        {dirtyEducational ? (
+          <DynamicListWithSaveCancel
+            listTitle="educational info"
+            valuesList={dirtyEducational}
+            ListItemComponent={EducationalInputs}
+            createNewListItem={createEmptyEducationalData}
+            onChange={onTypeChange.educational}
+            onCancelClick={onTypeCancel.educational}
+            onSaveClick={onTypeSave.educational}
+          />
+        ) : (
+          <EducationalSummaryWithEdit
+            valuesList={educationalProps}
+            onEditClick={onTypeEditClick.educational}
+          />
+        )}
 
-          {dirtyPractical ? (
-            <DynamicListWithSaveCancel
-              listTitle="practical info"
-              valuesList={dirtyPractical}
-              ListItemComponent={PracticalInputs}
-              createNewListItem={createEmptyPracticalData}
-              onChange={this.onTypeChange.practical}
-              onCancelClick={this.onTypeCancel.practical}
-              onSaveClick={this.onTypeSave.practical}
-            />
-          ) : (
-            <PracticalSummaryWithEdit
-              valuesList={practicalProps}
-              onEditClick={this.onTypeEditClick.practical}
-            />
-          )}
+        {dirtyPractical ? (
+          <DynamicListWithSaveCancel
+            listTitle="practical info"
+            valuesList={dirtyPractical}
+            ListItemComponent={PracticalInputs}
+            createNewListItem={createEmptyPracticalData}
+            onChange={onTypeChange.practical}
+            onCancelClick={onTypeCancel.practical}
+            onSaveClick={onTypeSave.practical}
+          />
+        ) : (
+          <PracticalSummaryWithEdit
+            valuesList={practicalProps}
+            onEditClick={onTypeEditClick.practical}
+          />
+        )}
 
-          {noEditing && (
-            <button type="button" className="btn btn--print" onClick={this.constructor.onPrint}>
-              Print to PDF
-            </button>
-          )}
-        </HorizontalSeparator>
-      </div>
-    )
-  }
+        {noEditing && (
+          <button type="button" className="btn btn--print" onClick={onPrint}>
+            Print to PDF
+          </button>
+        )}
+      </HorizontalSeparator>
+    </div>
+  )
 }
 
 export default CVSummary
