@@ -3,7 +3,14 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['plugin:react/recommended', 'airbnb', 'plugin:prettier/recommended'],
+  extends: [
+    'eslint:recommended',
+    'airbnb',
+    'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
+    'plugin:react-hooks/recommended',
+  ],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -11,15 +18,16 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react'],
+  plugins: ['react', 'import'],
   rules: {
     'react/jsx-filename-extension': 'off',
-    'react/prefer-stateless-function': 'off',
     'react/prop-types': 'off',
     'jsx-a11y/label-has-associated-control': 'off',
-    'no-console': 'off',
-    'react/destructuring-assignment': 'off',
+    'react/destructuring-assignment': ['error', 'always', { ignoreClassFields: true }],
     'react/jsx-props-no-spreading': 'off',
     'react/state-in-constructor': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/button-has-type': 'off',
+    'no-console': 'off',
   },
 }
