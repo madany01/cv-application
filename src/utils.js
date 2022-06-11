@@ -22,15 +22,19 @@ function createEmptyPracticalData() {
   }
 }
 
+function createPersonalData() {
+  return {
+    id: nanoid(),
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+  }
+}
+
 function createEmptyData() {
   return {
-    personal: {
-      id: nanoid(),
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-    },
+    personal: createPersonalData(),
     educational: [createEmptyEducationalData()],
     practical: [createEmptyPracticalData()],
   }
@@ -41,8 +45,9 @@ function createBoundedFunctions(types, fn) {
 }
 
 export {
-  createEmptyData,
+  createPersonalData,
   createEmptyEducationalData,
   createEmptyPracticalData,
+  createEmptyData,
   createBoundedFunctions,
 }
